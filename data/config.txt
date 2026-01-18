@@ -1,0 +1,4 @@
+width=50
+height=50
+tile_size=24
+tick_ms=120

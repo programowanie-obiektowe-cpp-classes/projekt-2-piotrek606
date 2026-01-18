@@ -1,10 +1,33 @@
 cmake_minimum_required(VERSION 3.20)
-project(cpp-project CXX)
+project(snake LANGUAGES CXX)
 
-file(GLOB_RECURSE SRC_FILES "${CMAKE_SOURCE_DIR}/src/*.cpp")
-add_executable(cpp-project ${SRC_FILES})
-target_include_directories(cpp-project PUBLIC "${CMAKE_SOURCE_DIR}/include")
-set_target_properties(cpp-project PROPERTIES CXX_STANDARD 23)
-if(MINGW)
-  target_link_libraries(cpp-project "-lstdc++exp")
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(SFML 3 CONFIG REQUIRED COMPONENTS Graphics Window System)
+
+add_executable(snake
+    src/main.cpp
+    src/Config.cpp
+    src/Random.cpp
+    src/Board.cpp
+    src/Snake.cpp
+    src/Food.cpp
+    src/Game.cpp
+)
+
+target_include_directories(snake PRIVATE "${CMAKE_SOURCE_DIR}/include")
+target_link_libraries(snake PRIVATE SFML::Graphics)
+
+if(MSVC)
+    target_compile_options(snake PRIVATE /W4 /permissive- /EHsc)
+else()
+    target_compile_options(snake PRIVATE -Wall -Wextra -pedantic)
 endif()
+
+add_custom_command(TARGET snake POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/data"
+        "$<TARGET_FILE_DIR:snake>/data"
+)
+
